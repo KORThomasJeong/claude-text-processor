@@ -28,7 +28,7 @@ services:
     container_name: claude-text-processor-db
     restart: always
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: claude
       POSTGRES_PASSWORD: claude_password
