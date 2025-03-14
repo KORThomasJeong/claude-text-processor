@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  claude-text-processor:
+    image: claude-text-processor:latest
+    container_name: claude-text-processor-app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://claude:claude_password@postgres:5432/claude_text_processor?schema=public
+      - SESSION_SECRET=your-secret-key-change-in-production
+      - SESSION_EXPIRY=604800
+      - COOKIE_NAME=session-id
+      - DEFAULT_MODEL=claude-3-7-sonnet-20250219
+      - DEFAULT_MAX_TOKENS=4096
+      - PUBLIC_PATHS=/login,/register
+      - API_PATH_PREFIX=/api
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=admin123
+      - ADMIN_NAME=관리자
+      - NODE_ENV=production
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: claude-text-processor-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: claude
+      POSTGRES_PASSWORD: claude_password
+      POSTGRES_DB: claude_text_processor
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claude -d claude_text_processor"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 데이터베이스 마이그레이션 및 초기 설정을 위한 서비스
+  init-db:
+    image: claude-text-processor:latest
+    container_name: claude-text-processor-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://claude:claude_password@postgres:5432/claude_text_processor?schema=public
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=admin123
+      - ADMIN_NAME=관리자
+    command: >
+      sh -c "npx prisma migrate deploy && node /app/scripts/seed.js"
+    volumes:
+      - ./scripts:/app/scripts
+
+volumes:
+  postgres_data:

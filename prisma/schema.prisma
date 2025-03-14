@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  name      String?
+  role      String     @default("pending") // "admin", "user", "pending"
+  apiConfig ApiConfig?
+  prompts   Prompt[]
+  results   Result[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model ApiConfig {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  apiKey    String
+  model     String   @default("claude-3-7-sonnet-20250219")
+  maxTokens Int      @default(4096)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Prompt {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  name          String
+  description   String?
+  template      String
+  category      String   @default("일반")
+  outputFormat  String   @default("text")
+  isFavorite    Boolean  @default(false)
+  isAdminPrompt Boolean  @default(false)
+  results       Result[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Result {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  promptId  String
+  prompt    Prompt   @relation(fields: [promptId], references: [id])
+  input     String
+  output    String   @db.Text
+  format    String   @default("text")
+  createdAt DateTime @default(now())
+}
