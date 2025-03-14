@@ -44,9 +44,22 @@ Claude API를 기반으로 텍스트를 처리하는 웹 애플리케이션입�
 
 ### Docker로 실행
 
-1. Docker 이미지 빌드:
+#### 방법 1: Dockerfile로 빌드 (기본 방법)
+
+1. Docker 이미지 빌드 및 컨테이너 실행:
    ```bash
-   docker-compose build
+   docker-compose up -d --build
+   ```
+
+2. 브라우저에서 `http://localhost:3000` 접속
+
+#### 방법 2: 로컬 이미지 사용
+
+이미 로컬에 빌드된 이미지를 사용하려면:
+
+1. 로컬 이미지 설정 파일 사용:
+   ```bash
+   cp docker-compose_uselocalimage docker-compose.yml
    ```
 
 2. 컨테이너 실행:

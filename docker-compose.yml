@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   claude-text-processor:
-    image: claude-text-processor:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: claude-text-processor-app
     restart: always
     ports:
@@ -43,7 +45,9 @@ services:
 
   # 데이터베이스 마이그레이션 및 초기 설정을 위한 서비스
   init-db:
-    image: claude-text-processor:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: claude-text-processor-init
     depends_on:
       postgres:
