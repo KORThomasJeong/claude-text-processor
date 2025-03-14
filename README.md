@@ -26,7 +26,7 @@ Claude API를 기반으로 텍스트를 처리하는 웹 애플리케이션입�
 
 1. 저장소 클론:
    ```bash
-   git clone https://github.com/yourusername/claude-text-processor.git
+   git clone https://github.com/KORThomasJeong/claude-text-processor.git
    cd claude-text-processor
    ```
 
